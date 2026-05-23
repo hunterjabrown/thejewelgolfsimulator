@@ -155,7 +155,12 @@ export default function HomePage() {
       </header>
 
       {loaded ? (
-        <StatusCard current={current} now={now} />
+        <StatusCard
+          current={current}
+          now={now}
+          myName={name}
+          onEnd={handleDelete}
+        />
       ) : (
         <div className="h-44 animate-pulse rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)]" />
       )}

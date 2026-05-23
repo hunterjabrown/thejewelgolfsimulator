@@ -6,9 +6,13 @@ import { formatDuration, formatTime } from "@/lib/time";
 export function StatusCard({
   current,
   now,
+  myName,
+  onEnd,
 }: {
   current: Session | null;
   now: number;
+  myName: string | null;
+  onEnd: (id: string) => void;
 }) {
   if (!current) {
     return (
@@ -32,6 +36,8 @@ export function StatusCard({
   const remaining = current.endsAt - now;
   const playerLabel =
     current.players === 1 ? "Solo" : `${current.players} players`;
+  const mine =
+    myName != null && current.name.toLowerCase() === myName.toLowerCase();
 
   return (
     <section className="rounded-3xl border border-[var(--color-busy)]/30 bg-gradient-to-br from-[var(--color-busy)]/15 to-transparent p-7">
@@ -52,6 +58,14 @@ export function StatusCard({
         <dt className="text-[var(--color-muted)]">Open to join</dt>
         <dd className="text-right">{current.openToJoin ? "Yes" : "No"}</dd>
       </dl>
+      {mine && (
+        <button
+          onClick={() => onEnd(current.id)}
+          className="mt-5 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-sm font-medium text-white/90 transition hover:border-white/40"
+        >
+          Done playing — free the sim
+        </button>
+      )}
     </section>
   );
 }

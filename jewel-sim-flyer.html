@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>The Jewel — Golf Simulator</title>
+    <style>
+      @page {
+        size: Letter;
+        margin: 0;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        color: #111;
+        background: #faf8f3;
+        -webkit-font-smoothing: antialiased;
+      }
+      .page {
+        width: 8.5in;
+        min-height: 11in;
+        margin: 0 auto;
+        background: #faf8f3;
+        display: flex;
+        flex-direction: column;
+      }
+      .band {
+        background: #0a0a0a;
+        color: #fff;
+        padding: 0.55in 0.6in;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .band img {
+        height: 1.05in;
+        width: auto;
+      }
+      .hero {
+        text-align: center;
+        padding: 0.55in 0.6in 0.35in;
+      }
+      .hero .title {
+        font-size: 0.95in;
+        font-weight: 200;
+        letter-spacing: 0.04em;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+      .hero .rule {
+        width: 1.4in;
+        height: 1px;
+        background: #111;
+        margin: 0.22in auto;
+        opacity: 0.55;
+      }
+      .hero .sub {
+        font-size: 0.18in;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: #555;
+      }
+      .lede {
+        text-align: center;
+        padding: 0 0.85in;
+        font-size: 0.18in;
+        line-height: 1.5;
+        color: #2a2a2a;
+        max-width: 6.5in;
+        margin: 0 auto;
+      }
+      .qr-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.4in 0 0.3in;
+      }
+      .qr-card {
+        background: #fff;
+        padding: 0.28in;
+        border: 1px solid #e7e2d6;
+        border-radius: 0.16in;
+        box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05);
+      }
+      .qr-card img {
+        display: block;
+        width: 2.6in;
+        height: 2.6in;
+      }
+      .qr-url {
+        margin-top: 0.18in;
+        font-size: 0.14in;
+        letter-spacing: 0.05em;
+        color: #555;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      .cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.4in;
+        padding: 0.2in 0.7in 0.35in;
+      }
+      .col h2 {
+        font-size: 0.13in;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: #6b8400;
+        margin-bottom: 0.14in;
+        font-weight: 600;
+      }
+      .col p,
+      .col li {
+        font-size: 0.155in;
+        line-height: 1.55;
+        color: #2a2a2a;
+      }
+      .col ol,
+      .col ul {
+        padding-left: 0.22in;
+      }
+      .col li {
+        margin-bottom: 0.06in;
+      }
+      .rules {
+        margin: 0 0.7in;
+        padding: 0.22in 0.3in;
+        background: #f1ecdf;
+        border-radius: 0.14in;
+        border-left: 3px solid #6b8400;
+      }
+      .rules h2 {
+        font-size: 0.13in;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: #6b8400;
+        margin-bottom: 0.12in;
+        font-weight: 600;
+      }
+      .rules ul {
+        list-style: none;
+      }
+      .rules li {
+        font-size: 0.155in;
+        line-height: 1.55;
+        color: #2a2a2a;
+        padding-left: 0.22in;
+        position: relative;
+        margin-bottom: 0.04in;
+      }
+      .rules li::before {
+        content: "·";
+        position: absolute;
+        left: 0.06in;
+        font-size: 0.3in;
+        line-height: 0.7;
+        color: #6b8400;
+      }
+      .footer {
+        margin-top: auto;
+        text-align: center;
+        padding: 0.35in 0.6in 0.5in;
+        font-size: 0.12in;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: #777;
+      }
+      @media print {
+        html,
+        body {
+          background: #faf8f3;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="band">
+        <img src="public/logo.webp" alt="LUX by Garden" />
+      </div>
+
+      <div class="hero">
+        <h1 class="title">The Jewel</h1>
+        <div class="rule"></div>
+        <p class="sub">Golf Simulator</p>
+      </div>
+
+      <p class="lede">
+        Hey neighbor — welcome to the sim. We made a tiny site so everyone in
+        the building gets a fair shot at playing. Scan, check in, or grab a
+        slot for later today.
+      </p>
+
+      <div class="qr-wrap">
+        <div class="qr-card">
+          <img src="jewel-sim-qr.png" alt="QR code to thejewelgolfsimulator.vercel.app" />
+        </div>
+        <p class="qr-url">thejewelgolfsimulator.vercel.app</p>
+      </div>
+
+      <div class="cols">
+        <div class="col">
+          <h2>If you're heading down now</h2>
+          <ol>
+            <li>Scan the code with your phone camera</li>
+            <li>Enter your name (it'll remember next time)</li>
+            <li>Tap <strong>"I'm playing right now"</strong></li>
+            <li>Pick how long you'll play and whether you're cool with company</li>
+          </ol>
+        </div>
+        <div class="col">
+          <h2>If you want a slot later today</h2>
+          <ol>
+            <li>Scan the same code</li>
+            <li>Tap <strong>"Schedule a slot today"</strong></li>
+            <li>Pick your start time (anytime left today)</li>
+            <li>Set your duration and join preferences — done</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="rules">
+        <h2>House rules</h2>
+        <ul>
+          <li>Day-of bookings only — no week-out hoarding, keeps it fair</li>
+          <li>If someone reserved exclusive time, please respect it</li>
+          <li>Cancel your slot if plans change so others can grab it</li>
+          <li>Honor system — be cool, clean up, have fun</li>
+        </ul>
+      </div>
+
+      <div class="footer">LUX by Garden · The Jewel Golf Simulator</div>
+    </div>
+  </body>
+</html>
