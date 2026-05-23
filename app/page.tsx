@@ -175,6 +175,10 @@ export default function HomePage() {
         >
           Schedule a slot today
         </button>
+        <p className="px-1 text-center text-[11px] leading-relaxed text-[var(--color-muted)]">
+          Day-of scheduling only — no booking ahead, so everyone gets a fair
+          shot at the sim.
+        </p>
       </div>
 
       <section>

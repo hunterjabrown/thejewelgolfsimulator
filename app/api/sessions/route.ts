@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { addSession, getAllSessions } from "@/lib/redis";
 import type { CreateSessionInput, Session } from "@/lib/types";
+import { formatTime } from "@/lib/time";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const MAX_NAME_LEN = 40;
@@ -50,15 +51,29 @@ export async function POST(req: Request) {
   const openToJoin = Boolean(body.openToJoin);
 
   const now = Date.now();
-  const startOfToday = new Date();
-  startOfToday.setHours(0, 0, 0, 0);
-  const endOfToday = startOfToday.getTime() + 24 * 60 * 60 * 1000;
+  const MAX_HORIZON_MS = 24 * 60 * 60 * 1000;
 
-  if (body.startsAt >= endOfToday) {
-    return bad("Day-of scheduling only");
+  if (body.startsAt > now + MAX_HORIZON_MS) {
+    return bad("Day-of scheduling only — pick a time within the next 24 hours");
   }
   if (body.endsAt < now - 60_000) {
     return bad("Cannot create a session in the past");
+  }
+
+  const existing = await getAllSessions();
+  const blocker = existing.find(
+    (s) =>
+      !s.openToJoin &&
+      s.startsAt < body.endsAt! &&
+      body.startsAt! < s.endsAt,
+  );
+  if (blocker) {
+    return NextResponse.json(
+      {
+        error: `${blocker.name} reserved the sim from ${formatTime(blocker.startsAt)} to ${formatTime(blocker.endsAt)} (no joiners). Pick a time outside that window.`,
+      },
+      { status: 409 },
+    );
   }
 
   const session: Session = {

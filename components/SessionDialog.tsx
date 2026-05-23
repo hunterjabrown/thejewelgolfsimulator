@@ -115,20 +115,28 @@ export function SessionDialog({
         </div>
 
         {mode === "schedule" && (
-          <Field label="Start time">
-            <input
-              type="datetime-local"
-              value={startInput}
-              min={minStartInput}
-              max={maxStartInput}
-              step={300}
-              onChange={(e) => setStartInput(e.target.value)}
-              className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-base outline-none focus:border-[var(--color-accent)]"
-            />
-            <p className="mt-1 text-xs text-[var(--color-muted)]">
-              Only today.
-            </p>
-          </Field>
+          <>
+            <div className="mb-5 rounded-xl border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/10 p-3 text-xs leading-relaxed">
+              <p className="font-semibold uppercase tracking-[0.14em] text-[var(--color-accent)]">
+                Day-of scheduling only
+              </p>
+              <p className="mt-1 text-white/80">
+                Slots open the day they're for — no booking ahead. Keeps it
+                fair for everyone in the building.
+              </p>
+            </div>
+            <Field label="Start time (today)">
+              <input
+                type="datetime-local"
+                value={startInput}
+                min={minStartInput}
+                max={maxStartInput}
+                step={300}
+                onChange={(e) => setStartInput(e.target.value)}
+                className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-2)] px-4 py-3 text-base outline-none focus:border-[var(--color-accent)]"
+              />
+            </Field>
+          </>
         )}
 
         <Field label="How long?">
