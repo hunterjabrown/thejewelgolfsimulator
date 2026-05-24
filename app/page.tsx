@@ -9,6 +9,7 @@ import { StatusCard } from "@/components/StatusCard";
 import type { CreateSessionInput, Session } from "@/lib/types";
 
 const NAME_KEY = "lux-golf:name";
+const DEVICE_KEY = "lux-golf:device";
 const POLL_MS = 15_000;
 
 type DialogMode = "now" | "schedule" | null;
@@ -31,6 +32,23 @@ export default function HomePage() {
       /* ignore */
     }
     setNameReady(true);
+
+    let deviceId: string | null = null;
+    try {
+      deviceId = window.localStorage.getItem(DEVICE_KEY);
+      if (!deviceId) {
+        deviceId = crypto.randomUUID();
+        window.localStorage.setItem(DEVICE_KEY, deviceId);
+      }
+    } catch {
+      /* ignore */
+    }
+    fetch("/api/visit", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ deviceId }),
+      keepalive: true,
+    }).catch(() => {});
   }, []);
 
   const saveName = useCallback((n: string) => {

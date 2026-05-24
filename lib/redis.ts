@@ -18,9 +18,8 @@ function redis(): Redis {
 }
 
 const SESSIONS_KEY = "lux:sessions";
-
-const MS_PER_HOUR = 60 * 60 * 1000;
-const RETENTION_MS = 36 * MS_PER_HOUR;
+const VISITS_COUNTER_KEY = "lux:visits";
+const DEVICES_SET_KEY = "lux:devices";
 
 export async function getAllSessions(): Promise<Session[]> {
   const raw = await redis().get<Session[] | string>(SESSIONS_KEY);
@@ -33,25 +32,40 @@ async function writeSessions(sessions: Session[]): Promise<void> {
   await redis().set(SESSIONS_KEY, JSON.stringify(sessions));
 }
 
-function pruneOld(sessions: Session[], now: number): Session[] {
-  return sessions.filter((s) => s.endsAt > now - RETENTION_MS);
-}
-
 export async function addSession(session: Session): Promise<Session[]> {
-  const now = Date.now();
   const existing = await getAllSessions();
-  const next = pruneOld([...existing, session], now);
+  const next = [...existing, session];
   await writeSessions(next);
   return next;
 }
 
 export async function deleteSession(id: string): Promise<Session[]> {
-  const now = Date.now();
   const existing = await getAllSessions();
-  const next = pruneOld(
-    existing.filter((s) => s.id !== id),
-    now,
-  );
+  const next = existing.filter((s) => s.id !== id);
   await writeSessions(next);
   return next;
+}
+
+export async function recordVisit(deviceId: string | null): Promise<void> {
+  const client = redis();
+  const ops: Promise<unknown>[] = [client.incr(VISITS_COUNTER_KEY)];
+  if (deviceId) {
+    ops.push(client.sadd(DEVICES_SET_KEY, deviceId));
+  }
+  await Promise.all(ops);
+}
+
+export async function getVisitStats(): Promise<{
+  totalVisits: number;
+  uniqueDevices: number;
+}> {
+  const client = redis();
+  const [visits, devices] = await Promise.all([
+    client.get<number>(VISITS_COUNTER_KEY),
+    client.scard(DEVICES_SET_KEY),
+  ]);
+  return {
+    totalVisits: typeof visits === "number" ? visits : Number(visits ?? 0),
+    uniqueDevices: typeof devices === "number" ? devices : 0,
+  };
 }
