@@ -160,13 +160,18 @@ export default async function Dashboard() {
 
       <Section title="Scan-to-booking funnel">
         <Funnel
-          scanned={funnel.uniqueDevices}
-          named={funnel.uniqueNamedDevices}
+          scanned={Math.max(funnel.uniqueDevices, uniquePlayers)}
+          named={Math.max(funnel.uniqueNamedDevices, uniquePlayers)}
           booked={uniquePlayers}
         />
         <p className="mt-3 text-xs text-[var(--color-muted)]">
           Total name-gate submissions:{" "}
-          <span className="text-white">{funnel.totalNamed}</span>
+          <span className="text-white">
+            {Math.max(funnel.totalNamed, uniquePlayers)}
+          </span>
+          <span className="ml-1">
+            · floor enforced (anyone who booked obviously entered a name)
+          </span>
         </p>
       </Section>
 
