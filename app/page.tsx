@@ -60,6 +60,25 @@ export default function HomePage() {
     }
   }, []);
 
+  const saveNameFromGate = useCallback(
+    (n: string) => {
+      saveName(n);
+      let deviceId: string | null = null;
+      try {
+        deviceId = window.localStorage.getItem(DEVICE_KEY);
+      } catch {
+        /* ignore */
+      }
+      fetch("/api/named", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ deviceId }),
+        keepalive: true,
+      }).catch(() => {});
+    },
+    [saveName],
+  );
+
   const load = useCallback(async () => {
     try {
       const res = await fetch("/api/sessions", { cache: "no-store" });
@@ -232,7 +251,7 @@ export default function HomePage() {
         Honor system · be cool · clean up after
       </footer>
 
-      {nameReady && !name && <NameGate onSave={saveName} />}
+      {nameReady && !name && <NameGate onSave={saveNameFromGate} />}
       {dialog && name && (
         <SessionDialog
           mode={dialog}

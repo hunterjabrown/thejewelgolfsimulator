@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getAllSessions, getVisitStats } from "@/lib/redis";
+import { getAllSessions, getFunnelStats } from "@/lib/redis";
 import type { Session } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -103,9 +103,9 @@ function pickPeak(counts: number[], labelFn: (i: number) => string): string {
 }
 
 export default async function Dashboard() {
-  const [sessions, visitStats] = await Promise.all([
+  const [sessions, funnel] = await Promise.all([
     getAllSessions(),
-    getVisitStats(),
+    getFunnelStats(),
   ]);
 
   const totalSessions = sessions.length;
@@ -149,14 +149,26 @@ export default async function Dashboard() {
         <Tile label="Unique players" value={String(uniquePlayers)} />
         <Tile label="Hours played" value={hoursLabel(totalMs)} />
         <Tile label="Avg session" value={fmtDuration(avgSessionMs)} />
-        <Tile label="Page visits" value={String(visitStats.totalVisits)} />
-        <Tile label="Unique scans" value={String(visitStats.uniqueDevices)} />
+        <Tile label="Page visits" value={String(funnel.totalVisits)} />
+        <Tile label="Unique scans" value={String(funnel.uniqueDevices)} />
         <Tile
           label="Avg party"
           value={avgParty ? avgParty.toFixed(1) : "—"}
         />
         <Tile label="Peak hour" value={peakHour} />
       </Grid>
+
+      <Section title="Scan-to-booking funnel">
+        <Funnel
+          scanned={funnel.uniqueDevices}
+          named={funnel.uniqueNamedDevices}
+          booked={uniquePlayers}
+        />
+        <p className="mt-3 text-xs text-[var(--color-muted)]">
+          Total name-gate submissions:{" "}
+          <span className="text-white">{funnel.totalNamed}</span>
+        </p>
+      </Section>
 
       <Section title="Most played day of week">
         <div className="grid grid-cols-7 gap-2">
@@ -272,6 +284,68 @@ function Section({
       </h2>
       {children}
     </section>
+  );
+}
+
+function Funnel({
+  scanned,
+  named,
+  booked,
+}: {
+  scanned: number;
+  named: number;
+  booked: number;
+}) {
+  const pct = (num: number, denom: number) =>
+    denom > 0 ? `${Math.round((num / denom) * 100)}%` : "—";
+  const max = Math.max(scanned, named, booked, 1);
+  const widthOf = (n: number) =>
+    `${Math.max(8, Math.round((n / max) * 100))}%`;
+
+  const rows: {
+    label: string;
+    value: number;
+    rate: string | null;
+    rateLabel: string;
+  }[] = [
+    { label: "Scanned the QR", value: scanned, rate: null, rateLabel: "" },
+    {
+      label: "Entered a name",
+      value: named,
+      rate: pct(named, scanned),
+      rateLabel: "of scanners",
+    },
+    {
+      label: "Booked a session",
+      value: booked,
+      rate: pct(booked, named),
+      rateLabel: "of named",
+    },
+  ];
+
+  return (
+    <div className="flex flex-col gap-3">
+      {rows.map((r) => (
+        <div key={r.label}>
+          <div className="mb-1.5 flex items-center justify-between text-xs text-[var(--color-muted)]">
+            <span>{r.label}</span>
+            {r.rate && (
+              <span>
+                <span className="text-white">{r.rate}</span> {r.rateLabel}
+              </span>
+            )}
+          </div>
+          <div className="h-9 w-full overflow-hidden rounded-lg bg-[var(--color-surface)]">
+            <div
+              className="flex h-full items-center bg-[var(--color-accent)]/80 px-3 text-sm font-medium text-black"
+              style={{ width: widthOf(r.value) }}
+            >
+              {r.value}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 

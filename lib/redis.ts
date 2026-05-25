@@ -20,6 +20,8 @@ function redis(): Redis {
 const SESSIONS_KEY = "lux:sessions";
 const VISITS_COUNTER_KEY = "lux:visits";
 const DEVICES_SET_KEY = "lux:devices";
+const NAMED_COUNTER_KEY = "lux:named";
+const NAMED_DEVICES_SET_KEY = "lux:named_devices";
 
 export async function getAllSessions(): Promise<Session[]> {
   const raw = await redis().get<Session[] | string>(SESSIONS_KEY);
@@ -55,17 +57,32 @@ export async function recordVisit(deviceId: string | null): Promise<void> {
   await Promise.all(ops);
 }
 
-export async function getVisitStats(): Promise<{
+export async function recordNamed(deviceId: string | null): Promise<void> {
+  const client = redis();
+  const ops: Promise<unknown>[] = [client.incr(NAMED_COUNTER_KEY)];
+  if (deviceId) {
+    ops.push(client.sadd(NAMED_DEVICES_SET_KEY, deviceId));
+  }
+  await Promise.all(ops);
+}
+
+export async function getFunnelStats(): Promise<{
   totalVisits: number;
   uniqueDevices: number;
+  totalNamed: number;
+  uniqueNamedDevices: number;
 }> {
   const client = redis();
-  const [visits, devices] = await Promise.all([
+  const [visits, devices, named, namedDevices] = await Promise.all([
     client.get<number>(VISITS_COUNTER_KEY),
     client.scard(DEVICES_SET_KEY),
+    client.get<number>(NAMED_COUNTER_KEY),
+    client.scard(NAMED_DEVICES_SET_KEY),
   ]);
   return {
     totalVisits: typeof visits === "number" ? visits : Number(visits ?? 0),
     uniqueDevices: typeof devices === "number" ? devices : 0,
+    totalNamed: typeof named === "number" ? named : Number(named ?? 0),
+    uniqueNamedDevices: typeof namedDevices === "number" ? namedDevices : 0,
   };
 }
